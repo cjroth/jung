@@ -1,0 +1,11 @@
+<div
+  class="question<% if (answer) { %> answered<% } %><% if (answerable) { %> answerable<% } %>"
+  data-question-id="<%= id %>"
+  <% if (answer) { %>data-answer="<%= answer %>"<% } %>>
+  <h2><%= question %></h2>
+  <div class="answers">
+    <% for (var i in answers) { %>
+      <button class="btn btn-large<%= (answers[i] == answer) ? ' btn-primary' : '' %>" value="<%= answers[i] %>"><%= answers[i] %></button>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include head %>
+  </head>
+  <body>
+    <style>
+
+      body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #eee;
+      }
+
+      .signup-login-tab-container .nav.nav-tabs {
+        margin: 0 auto;
+        border-bottom: 0;
+        display: table;
+      }
+
+      .form-container {
+        max-width: 300px;
+        padding: 30px;
+        margin: 0 auto;
+      }
+
+      .form-signup .form-signup-heading,
+      .form-signup .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signup .checkbox {
+        font-weight: normal;
+      }
+      .form-signup input[type="text"],
+      .form-signup input[type="password"] {
+        position: relative;
+        font-size: 16px;
+        height: auto;
+        padding: 10px;
+        -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+                box-sizing: border-box;
+      }
+      .form-signup input[type="text"]:focus,
+      .form-signup input[type="password"]:focus {
+        z-index: 2;
+      }
+      .form-signup input[type="text"] {
+        margin-bottom: -1px;
+      }
+      .form-signup input {
+        border-radius: 0;
+      }
+      .form-signup input[name="first_name"] {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+      .form-signup input[name="password"] {
+        margin-bottom: 10px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+
+
+
+
+      .form-login .form-login-heading,
+      .form-login .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-login .checkbox {
+        font-weight: normal;
+      }
+      .form-login input[type="text"],
+      .form-login input[type="password"] {
+        position: relative;
+        font-size: 16px;
+        height: auto;
+        padding: 10px;
+        -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+                box-sizing: border-box;
+      }
+      .form-login input[type="text"]:focus,
+      .form-login input[type="password"]:focus {
+        z-index: 2;
+      }
+      .form-login input[type="text"] {
+        margin-bottom: -1px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .form-login input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+
+    </style>
+
+    <div class="container">
+      <div class="form-container">
+
+        <div class="signup-login-tab-container">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#login" data-toggle="tab">Login</a></li>
+            <li><a href="#signup" data-toggle="tab">Sign Up</a></li>
+          </ul>
+        </div>
+
+        <div class="tab-content">
+
+          <div id="login" class="tab-pane active">
+            <form class="form form-login" action="/login" method="POST">
+              <input name="username" type="text" class="input-block-level" placeholder="Email address" autofocus>
+              <input name="password" type="password" class="input-block-level" placeholder="Password">
+              <label class="checkbox">
+                <input type="checkbox" value="remember-me"> Remember me
+              </label>
+              <button class="btn btn-large btn-primary btn-block" type="submit">Sign in</button>
+            </form>
+          </div>
+
+          <div id="signup" class="tab-pane">
+            <form class="form form-signup" action="/signup" method="POST">
+              <input name="first_name" type="text" class="input-block-level" placeholder="First name">
+              <input name="last_name" type="text" class="input-block-level" placeholder="Last name">
+              <input name="email" type="text" class="input-block-level" placeholder="Email address" autofocus>
+              <input name="password" type="password" class="input-block-level" placeholder="Password">
+              <button class="btn btn-large btn-primary btn-block" type="submit">Register</button>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <script src="/javascripts/login.js"></script>
+
+  </body>
+</html>

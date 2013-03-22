@@ -1,0 +1,41 @@
+<% stylesheet('/bootstrap/css/bootstrap.min.css') %>
+<% stylesheet('/stylesheets/global.css') %>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <%- stylesheets %>
+  </head>
+  <body>
+    <header>
+      <div class="navbar navbar-fixed-top">
+        <a class="navbar-brand" href="/">Jung</a>
+        <ul class="nav">
+          <li><a href="/home">Home</a></li>
+          <li><a href="/question/new">New Question</a></li>
+          <li><a href="/gauge/new">New Gauge</a></li>
+          <li><a id="clear-answers" href="/answer/clear-all">Clear Answers</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          <li id="fat-menu" class="dropdown">
+            <a href="#" id="user-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown"><%= user.first_name %><b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="user-dropdown">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/profile">My Account</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </header>
+    <%- body %>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/javascripts/ejs.min.js"></script>
+    <script id="question-template" type="text/template">
+      <%- question_template %>
+    </script>
+    <script src="/javascripts/global.js"></script>
+    <%- scripts %>
+  </body>
+</html>

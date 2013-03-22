@@ -1,0 +1,12 @@
+two possibilities:
+
+1. user has session
+  -> session maps to a user account
+      -> user is logged in
+  -> session does not map to a user account
+2. user does not have session
+  -> create a new session
+
+  if user logs in after already having a different session, merge session data with user account
+  if user creates an account after already having session data, merge session data with new user account
+

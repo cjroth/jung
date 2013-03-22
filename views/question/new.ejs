@@ -1,0 +1,36 @@
+<% layout('/global') %>
+<% stylesheet('/stylesheets/question/new.css') %>
+<% script('/javascripts/question/new.js') %>
+
+<div class="row">
+  <div class="span6">
+
+    <form class="form form-question" action="/question/new" method="POST" data-success="/home">
+      <input name="question" type="text" placeholder="e.g. What is your favorite color?"></input>
+      <ul class="list-unstyled">
+        <li>
+          <input name="answers" type="text" placeholder="e.g. Blue"></input>
+        </li>
+        <li>
+          <input name="answers" type="text" placeholder="e.g. Green"></input>
+        </li>
+        <li>
+          <input name="answers" type="text" placeholder="e.g. Red"></input>
+        </li>
+        <li>
+          <input name="answers" type="text" placeholder="e.g. Blue"></input>
+        </li>
+      </ul>
+      <button type="submit" class="btn btn-primary">Create Question</button>
+    </form>
+
+  </div>
+
+  <div class="span6">
+    <h2>Questions you've written</h2>
+    <% for (var i in questions) { %>
+      <%- questions[i].render() %>
+    <% } %>
+  </div>
+
+</div>

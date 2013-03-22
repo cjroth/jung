@@ -1,0 +1,8 @@
+<% layout('/global') %>
+<% stylesheet('/stylesheets/gauge/new.css') %>
+<% script('/javascripts/gauge/new.js') %>
+
+<form class="form form-gauge" action="/gauge/new" method="POST" data-success="/gauge/:id">
+  <input name="name" type="text" placeholder="Name your gauge">
+  <button type="submit" class="btn btn-primary">Create Gauge</button>
+</form>

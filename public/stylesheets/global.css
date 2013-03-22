@@ -1,0 +1,25 @@
+body {
+  margin: 50px auto;
+  max-width: 1020px;
+  padding: 30px;
+}
+
+.question {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.question h2 {
+  background: #ccc;
+  margin: 0;
+  padding: 15px 30px;
+}
+
+.question .answers {
+  background: #eee;
+  padding: 15px 30px;
+}
+
+.question .answers button {
+  margin-bottom: 7px;
+}
