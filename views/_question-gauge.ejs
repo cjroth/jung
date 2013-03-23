@@ -1,0 +1,24 @@
+<div
+  class="question question-gauge<% if (answer) { %> answered<% } %><% if (answerable) { %> answerable<% } %>"
+  data-question-id="<%= id %>"
+  <% if (answer) { %>data-answer="<%= answer %>"<% } %>>
+  <h2><%= question %></h2>
+  <table class="answers">
+    <% for (var i in answers) { %>
+      <tr>
+        <td>
+          <button class="btn" value="<%= answers[i] %>"><%= answers[i] %></button>
+        </td>
+        <td>
+          <button class="btn incrementor" value="+1"><span class="glyphicon glyphicon-plus"></span></button>
+        </td>
+        <td>
+          <input class="score" type="text" value="0"></input>
+        </td>
+        <td>
+          <button class="btn incrementor" value="-1"><span class="glyphicon glyphicon-minus"></span></button>
+        </td>
+      </tr>
+    <% } %>
+  </table>
+</div>

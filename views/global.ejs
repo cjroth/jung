@@ -13,8 +13,8 @@
         <a class="navbar-brand" href="/">Jung</a>
         <ul class="nav">
           <li><a href="/home">Home</a></li>
-          <li><a href="/question/new">New Question</a></li>
-          <li><a href="/gauge/new">New Gauge</a></li>
+          <li><a href="/question/new">Questions</a></li>
+          <li><a href="/gauge/new">Gauges</a></li>
           <li><a id="clear-answers" href="/answer/clear-all">Clear Answers</a></li>
         </ul>
         <ul class="nav pull-right">
@@ -30,10 +30,14 @@
     </header>
     <%- body %>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <script src="/javascripts/ejs.min.js"></script>
     <script id="question-template" type="text/template">
       <%- question_template %>
+    </script>
+    <script id="question-gauge-template" type="text/template">
+      <%- question_gauge_template %>
     </script>
     <script src="/javascripts/global.js"></script>
     <%- scripts %>

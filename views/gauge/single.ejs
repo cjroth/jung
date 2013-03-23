@@ -2,9 +2,44 @@
 <% stylesheet('/stylesheets/gauge/single.css') %>
 <% script('/javascripts/gauge/single.js') %>
 
-<h1><%= gauge.name %></h1>
+<div class="row">
 
-Add a question: <input class="question-search" type="text" data-results=".question-search-results">
-<div class="question-search-results">
+  <div class="span6">
+
+    <%- gauge.render() %>
+
+    Add a question: <input class="question-search" type="text" data-results=".question-search-results">
+    <div class="question-search-results"></div>
+
+  </div>
+
+  <div class="span6">
+
+    <div class="questions-list">
+      <% for (var i in questions) { %>
+        <%- questions[i].render() %>
+      <% } %>
+    </div>
+
+  </div>
 
 </div>
+
+<div id="add-question-modal" class="modal">
+  <!-- Button trigger modal -->
+
+  <!-- Modal -->
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Adding question to gauge.</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-primary modal-save">Add to gauge</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dalog -->
+</div><!-- /.modal -->

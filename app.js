@@ -56,6 +56,9 @@ app.configure('development', function() {
 });
 
 var question_template = fs.readFileSync(__dirname + '/views/_question.ejs').toString();
+var gauge_template = fs.readFileSync(__dirname + '/views/_gauge.ejs').toString();
+var question_gauge_template = fs.readFileSync(__dirname + '/views/_question-gauge.ejs').toString();
+
 
 /*
  * SEQUELIZE
@@ -69,6 +72,9 @@ var User = sequelize.import(__dirname + '/models/user');
 var Question = sequelize.import(__dirname + '/models/question');
 var Answer = sequelize.import(__dirname + '/models/answer');
 var Gauge = sequelize.import(__dirname + '/models/gauge');
+
+var GaugeQuestionMap = sequelize.import(__dirname + '/models/gauge-question-map');
+
 
 Gauge.hasMany(Question);
 Question.hasMany(Gauge);
@@ -125,6 +131,7 @@ passport.authorize = function(req, res, next) {
 };
 
 var renderQuestion = ejs.compile(question_template);
+var renderGauge = ejs.compile(gauge_template);
 
 var QuestionModel = function(row) {
   this.answerable = false;
@@ -145,6 +152,16 @@ QuestionModel.prototype.render = function() {
     answer: this.answer,
     answerable: this.answerable
   });
+};
+
+var GaugeModel = function(row) {
+  for (var i in row) {
+    this[i] = row[i];
+  }
+};
+
+GaugeModel.prototype.render = function() {
+  return renderGauge(this);
 };
 
 var getNextQuestionSet = function(user_id, callback) {
@@ -179,7 +196,29 @@ var getUserQuestions = function(user_id, callback) {
     }
     callback(err, questions);
   });
-}
+};
+
+var getUserGauges = function(user_id, callback) {
+  mysql_connection.query('select * from gauges where created_by = ?', [user_id], function(err, rows) {
+    var gauges = [];
+    for (var i in rows) {
+      var row = rows[i];
+      gauges.push(new GaugeModel(row));
+    }
+    callback(err, gauges);
+  });
+};
+
+var getGaugeQuestions = function(gauge_id, callback) {
+  mysql_connection.query('select * from questions join gauge_question_maps on questions.id = gauge_question_maps.question_id where gauge_id = ?', [gauge_id], function(err, rows) {
+    var questions = [];
+    for (var i in rows) {
+      var row = rows[i];
+      questions.push(new QuestionModel(row));
+    }
+    callback(err, questions);
+  });
+};
 
 /*
  * ROUTES
@@ -211,7 +250,8 @@ app.get('/home', function(req, res) {
       user: req.user,
       questions: results[0],
       answers: results[1],
-      question_template: question_template
+      question_template: question_template,
+      question_gauge_template: question_gauge_template
     });
   });
 });
@@ -256,9 +296,14 @@ app.post('/signup', function(req, res) {
 });
 
 app.get('/gauge/new', passport.authorize, function(req, res) {
-  res.render('gauge/new', {
-    user: req.user,
-    question_template: question_template
+  getUserGauges(req.user.id, function(err, gauges) {
+    // @todo handle err
+    res.render('gauge/new', {
+      user: req.user,
+      question_template: question_template,
+      gauges: gauges,
+      question_gauge_template: question_gauge_template
+    });
   });
 });
 
@@ -280,16 +325,21 @@ app.post('/gauge/new', passport.authorize, function(req, res) {
 
 app.get('/gauge/:id', function(req, res) {
 
-  Gauge.find(req.params.id)
-  .success(function(gauge) {
-    res.render('gauge/single', {
-      user: req.user,
-      gauge: gauge,
-      question_template: question_template
-    });
-  })
-  .error(function(error) {
-    // @todo handle error
+  getGaugeQuestions(req.params.id, function(err, questions) {
+
+    Gauge.find(req.params.id)
+      .success(function(gauge) {
+        res.render('gauge/single', {
+          user: req.user,
+          gauge: new GaugeModel(gauge),
+          questions: questions,
+          question_template: question_template,
+          question_gauge_template: question_gauge_template
+        });
+      })
+      .error(function(error) {
+        // @todo handle error
+      });
   });
 
 });
@@ -313,7 +363,8 @@ app.get('/question/new', passport.authorize, function(req, res) {
     return res.render('question/new', {
       user: req.user,
       questions: questions,
-      question_template: question_template
+      question_template: question_template,
+      question_gauge_template: question_gauge_template
     });
   });
 });
@@ -352,6 +403,21 @@ app.get('/answer/all', function(req, res) {
   getAnsweredQuestions(req.user.id, function(err, rows) {
     // @todo handle error
     return res.json(rows);
+  });
+});
+
+app.post('/gauge/add-question', function(req, res) {
+  GaugeQuestionMap.create({
+    gauge_id: req.body.gauge_id,
+    question_id: req.body.question_id,
+    scoring: req.body.scoring.toString()
+  })
+  .success(function() {
+    res.json({ result: true });
+  })
+  .error(function(error) {
+    console.error(error);
+    res.json({ result: false, errors: [error] });
   });
 });
 
