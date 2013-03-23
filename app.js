@@ -454,6 +454,44 @@ app.post('/answer/:question_id', passport.authorize, function(req, res) {
     });
 });
 
+app.get('/score/:gauge_id', function(req, res) {
+
+  var user_id = req.user.id;
+  var gauge_id = req.params.gauge_id;
+
+  mysql_connection.query('select * from answers join questions on answers.question_id = questions.id join gauge_question_maps on questions.id = gauge_question_maps.question_id where answered_by = ? and gauge_id = ?', [user_id, gauge_id], function(err, rows) {
+    // @todo handle err
+
+    var scores = [];
+
+    for (var i in rows) {
+      var row = rows[i];
+      var answers = row.answers.split(',');
+      var answer_value = row.answer;
+      var answer_index = answers.indexOf(answer_value);
+      var scoring = row.scoring.split(',');
+      var answer_score = scoring[answer_index];
+      scores.push(answer_score);
+      //if (i == 2) {
+        console.log(scoring, answer_score, answer_index);
+      //}
+    }
+
+    var sum = 0;
+
+    for (var i in scores) {
+      var score = scores[i];
+      sum += parseInt(score);
+    }
+
+    var mean = sum / scores.length;
+
+    //res.json({ total: sum, score: mean, scores: scores, answers: rows });
+    res.json({ score: mean, answers: scores.length });
+  });
+
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
