@@ -1,0 +1,18 @@
+<% layout('/global') %>
+<% stylesheet('/stylesheets/user/single.css') %>
+<% script('/javascripts/user/single.js') %>
+
+<div class="row">
+
+  <div class="span6">
+
+    <h1><%= target_user.first_name + ' ' + target_user.last_name %></h1>
+
+    <p>Answered <%= questions_answered %> questions.</p>
+    <p>Wrote <%= questions_written %> questions.</p>
+    <p>Created <%= gauges_created %> gauges.</p>
+
+
+  </div>
+
+</div>

@@ -454,6 +454,79 @@ app.post('/answer/:question_id', passport.authorize, function(req, res) {
     });
 });
 
+app.get('/scores', function(req, res) {
+
+  var user_id = req.user.id;
+
+  mysql_connection.query('select * from gauges', function(err, rows) {
+
+    var gauges = [];
+    for (var i in rows) {
+      var row = rows[i];
+      var gauge = new GaugeModel(row);
+      gauges.push(gauge);
+    }
+
+    res.render('gauges', {
+      gauges: gauges,
+      user: req.user,
+      question_template: question_template,
+      question_gauge_template: question_gauge_template
+    });
+
+  });
+
+});
+
+app.get('/user/:id', function(req, res) {
+
+  var user_id = req.params.id;
+
+  async.parallel([function(callback) {
+
+    mysql_connection.query('select * from users where id = ?', [user_id], function(err, rows) {
+      callback(err, rows[0]);
+    });
+
+  }, function(callback) {
+
+    mysql_connection.query('select count(*) as gauges_created from gauges where created_by = ?', [user_id], function(err, rows) {
+      callback(err, rows[0].gauges_created);
+    });
+
+  }, function(callback) {
+
+    mysql_connection.query('select count(*) as questions_answered from answers where answered_by = ?', [user_id], function(err, rows) {
+      callback(err, rows[0].questions_answered);
+    });
+
+  }, function(callback) {
+
+    mysql_connection.query('select count(*) as questions_written from questions where created_by = ?', [user_id], function(err, rows) {
+      callback(err, rows[0].questions_written);
+    });
+
+  }], function(err, results) {
+
+    var user = results[0];
+    var gauges_created = results[1];
+    var questions_answered = results[2];
+    var questions_written = results[3];
+
+    res.render('user/single', {
+      user: req.user,
+      target_user: user,
+      gauges_created: gauges_created,
+      questions_answered: questions_answered,
+      questions_written: questions_written,
+      question_template: question_template,
+      question_gauge_template: question_gauge_template
+    });
+
+  });
+
+});
+
 app.get('/score/:gauge_id', function(req, res) {
 
   var user_id = req.user.id;

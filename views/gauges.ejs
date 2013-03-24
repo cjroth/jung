@@ -1,0 +1,18 @@
+<% layout('/global') %>
+<% stylesheet('/stylesheets/gauges.css') %>
+<% script('/javascripts/gauges.js') %>
+
+<div class="row">
+
+  <div class="span6">
+
+    <div class="gauges-list">
+      <% for (var i in gauges) { %>
+        <%- gauges[i].render() %>
+        <button class="gauge-get-score btn" data-gauge-id="<%= gauges[i].id %>">Get Score</button>
+      <% } %>
+    </div>
+
+  </div>
+
+</div>
