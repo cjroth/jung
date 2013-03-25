@@ -2,10 +2,26 @@
   class="question<% if (answer) { %> answered<% } %><% if (answerable) { %> answerable<% } %>"
   data-question-id="<%= id %>"
   <% if (answer) { %>data-answer="<%= answer %>"<% } %>>
-  <h2><%= question %></h2>
+  <div class="image">
+    <h3><%= question %></h3>
+  </div>
   <div class="answers">
     <% for (var i in answers) { %>
       <button class="btn btn-large<%= (answers[i] == answer) ? ' btn-primary' : '' %>" value="<%= answers[i] %>"><%= answers[i] %></button>
     <% } %>
+
+
+<div class="btn-group dropup pull-right">
+  <button class="btn btn-large">Skip</button>
+  <button class="btn btn-large dropdown-toggle" data-toggle="dropdown">
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="#">Offensive</a></li>
+    <li><a href="#">Confusing</a></li>
+    <li><a href="#">Stupid</a></li>
+  </ul>
+</div>
+
   </div>
 </div>

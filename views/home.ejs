@@ -2,13 +2,13 @@
 <% stylesheet('/stylesheets/home.css') %>
 
 <div class="row">
-  <div class="span6">
+  <div class="span7">
     <h2>Questions for you</h2>
     <% for (var i in questions) { %>
       <%- questions[i].render() %>
     <% } %>
   </div>
-  <div class="span6">
+  <div class="span5">
     <h2>Questions you've answered</h2>
     <% for (var i in answers) { %>
       <%- answers[i].render() %>
