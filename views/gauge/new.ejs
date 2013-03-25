@@ -14,6 +14,7 @@
   <div class="span6">
     <% for (var i in gauges) { %>
       <%- gauges[i].render() %>
+      <button class="gauge-get-score btn" data-gauge-id="<%= gauges[i].id %>">Get Score</button>
     <% } %>
   </div>
 </div>

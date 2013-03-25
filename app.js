@@ -454,27 +454,24 @@ app.post('/answer/:question_id', passport.authorize, function(req, res) {
     });
 });
 
-app.get('/scores', function(req, res) {
+app.get('/charts', function(req, res) {
 
-  var user_id = req.user.id;
-
-  mysql_connection.query('select * from gauges', function(err, rows) {
-
-    var gauges = [];
-    for (var i in rows) {
-      var row = rows[i];
-      var gauge = new GaugeModel(row);
-      gauges.push(gauge);
-    }
-
-    res.render('gauges', {
-      gauges: gauges,
-      user: req.user,
-      question_template: question_template,
+  res.render('charts', {
+    user: req.user,
+          question_template: question_template,
       question_gauge_template: question_gauge_template
-    });
-
   });
+
+});
+
+app.get('/chart/:id', function(req, res) {
+
+  var chart_id = req.params.id;
+
+  res.render('charts/' + chart_id, {
+    user: req.user,
+          question_template: question_template,
+      question_gauge_template: question_gauge_template  });
 
 });
 
@@ -524,6 +521,16 @@ app.get('/user/:id', function(req, res) {
     });
 
   });
+
+});
+
+app.get('/question', function(req, res) {
+
+    res.render('question', {
+      user: req.user,
+      question_template: question_template,
+      question_gauge_template: question_gauge_template
+    });
 
 });
 
