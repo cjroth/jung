@@ -2,18 +2,21 @@
 <% stylesheet('/stylesheets/gauge/single.css') %>
 <% script('/javascripts/gauge/single.js') %>
 
+<div class="spectrum-header">
+  <div class="spectrum clearfix"><h2 contentEditable>Introverted</h2></div>
+  <div class="spectrum clearfix"><h2>Extroverted</h2></div>
+</div>
+
 <div class="row">
 
-  <div class="span6">
-
-    <%- gauge.render() %>
+  <div class="span7">
 
     Add a question: <input class="question-search" type="text" data-results=".question-search-results">
     <div class="question-search-results"></div>
 
   </div>
 
-  <div class="span6">
+  <div class="span5">
 
     <div class="questions-list">
       <% for (var i in questions) { %>

@@ -3,6 +3,21 @@
   data-question-id="<%= id %>"
   <% if (answer) { %>data-answer="<%= answer %>"<% } %>>
   <h2><%= question %></h2>
+
+  <div class="spectrum-label-left">Introvert</div>
+  <ul class="answers unstyled">
+    <li>
+      <div>
+        <button class="btn"></button>
+      </div>
+      <div>
+        <div id="star"></div>
+      </div>
+    </li>
+  </ul>
+  <div class="spectrum-label-left">Extrovert</div>
+
+
   <table class="answers">
     <% for (var i in answers) { %>
       <tr>

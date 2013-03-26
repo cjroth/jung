@@ -526,10 +526,14 @@ app.get('/user/:id', function(req, res) {
 
 app.get('/question', function(req, res) {
 
-    res.render('question', {
-      user: req.user,
-      question_template: question_template,
-      question_gauge_template: question_gauge_template
+    mysql_connection.query('select * from questions where id = 1', function(err, rows) {
+      var question = new QuestionModel(rows[0]);
+      res.render('question', {
+        user: req.user,
+        question_template: question_template,
+        question_gauge_template: question_gauge_template,
+        question: question
+      });
     });
 
 });

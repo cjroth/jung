@@ -39,8 +39,7 @@ body {
 }
 
 .question .dropdown-menu, .question .btn {
-    border-radius: 0 !important;
-
+  border-radius: 0 !important;
 }
 
 .question button {
