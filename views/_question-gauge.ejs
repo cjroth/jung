@@ -1,39 +1,32 @@
-<div
-  class="question question-gauge<% if (answer) { %> answered<% } %><% if (answerable) { %> answerable<% } %>"
-  data-question-id="<%= id %>"
-  <% if (answer) { %>data-answer="<%= answer %>"<% } %>>
-  <h2><%= question %></h2>
+    <div
+      class="question question-set-spectrum"
+      data-question-id="<%= id %>">
 
-  <div class="spectrum-label-left">Introvert</div>
-  <ul class="answers unstyled">
-    <li>
-      <div>
-        <button class="btn"></button>
+      <div class="image">
+        <h3><%= question %></h3>
       </div>
-      <div>
-        <div id="star"></div>
+
+      <div class="answers clearfix">
+
+        <div class="left-label spectrum-label">
+          <div>Introverted</div>
+        </div>
+
+        <% for (var i in answers) { %>
+          <div class="answer clearfix">
+            <div class="button-box">
+              <button class="btn" value="<%= answers[i] %>"><%= answers[i] %></button>
+            </div>
+            <div class="spectrum-box">
+              <div class="spectrum-score" data-score="<%= scoring[i] %>"></div>
+            </div>
+          </div>
+        <% } %>
+
+        <div class="right-label spectrum-label">
+          <div>Extroverted</div>
+        </div>
+
       </div>
-    </li>
-  </ul>
-  <div class="spectrum-label-left">Extrovert</div>
 
-
-  <table class="answers">
-    <% for (var i in answers) { %>
-      <tr>
-        <td>
-          <button class="btn" value="<%= answers[i] %>"><%= answers[i] %></button>
-        </td>
-        <td>
-          <button class="btn incrementor" value="+1"><span class="glyphicon glyphicon-plus"></span></button>
-        </td>
-        <td>
-          <input class="score" type="text" value="0"></input>
-        </td>
-        <td>
-          <button class="btn incrementor" value="-1"><span class="glyphicon glyphicon-minus"></span></button>
-        </td>
-      </tr>
-    <% } %>
-  </table>
-</div>
+    </div>

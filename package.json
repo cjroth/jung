@@ -19,6 +19,7 @@
     "ejs-locals": "~1.0.2",
     "pg": "~0.14.1",
     "mysql": "~2.0.0-alpha7",
-    "async": "~0.2.6"
+    "async": "~0.2.6",
+    "underscore": "~1.4.4"
   }
 }

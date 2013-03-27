@@ -39,3 +39,7 @@
 .spectrum:only-child {
   border-width: 0 10px 10px 0;
 }
+
+.question-search-results .question {
+  cursor: pointer;
+}

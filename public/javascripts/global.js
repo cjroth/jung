@@ -8,19 +8,26 @@ var Question = function(object) {
   this.$element = null;
   this.question_id = object.id;
   this.answerable = false;
+  this.compact = false;
   this.answer = null;
   this.answers = [];
   this.draggable = false;
+  this.scoring = [];
   if (object.nodeName || object.jquery) {
     this.$element = $(object);
     this.question_id = this.$element.data('question-id');
-    this.question = this.$element.find('h2').text();
+    this.question = this.$element.find('h3').text();
     this.answerable = this.$element.hasClass('answerable');
+    this.compact = this.$element.hasClass('compact');
     this.answer = this.$element.data('answer');
     this.draggable = this.$element.hasClass('draggable');
-    this.$element.find('.answers button').each(function() {
+    this.$element.find('.answers .answer').each(function() {
       var answer = $(this).val();
       self.answers.push(answer);
+    });
+    this.$element.find('.spectrum-score input').each(function() {
+      var score = $(this).val();
+      self.scoring.push(score);
     });
   } else {
     for (var i in object) {
@@ -59,12 +66,12 @@ Question.prototype._attachEventListeners = function() {
       }
     });
   }
-  if (this.$element.hasClass('question-gauge')) {
-    this.$element.find('button.incrementor').click(function() {
-      var operator = parseInt($(this).val());
-      var $input = $(this).parents('tr').find('input');
-      var value = parseInt($input.val());
-      $input.val(value + operator);
+  if (this.$element.hasClass('question-set-spectrum')) {
+    this.$element.find('.spectrum-score').each(function() {
+      $(this).raty({
+        path: '/raty/img',
+        score: $(this).data('score')
+      });
     });
   }
 };
@@ -80,7 +87,9 @@ Question.prototype.render = function(view) {
     question: this.question,
     answers: this.getAnswers(),
     answer: this.answer,
-    answerable: this.answerable
+    answerable: this.answerable,
+    compact: this.compact,
+    scoring: this.scoring
   });
   this.$element.replaceWith(html);
   this.$element = $('.question[data-question-id=' + this.question_id + ']')
@@ -98,24 +107,6 @@ Question.prototype.render = function(view) {
       window.location.reload(true);
     });
     return false;
-  });
-
-  $('input.question-search').on('keyup', function() {
-    var query = $(this).val();
-    var $result_container = $($(this).data('results'));
-    if (!query) {
-      $result_container.empty();
-      return;
-    }
-    $.get('/question/search?query=' + query, function(questions) {
-      $result_container.empty();
-      for (var i in questions) {
-        questions[i].draggable = true;
-        var question = new Question(questions[i]);
-        question.$element = $('<div>').appendTo($result_container);
-        question.render();
-      }
-    });
   });
 
   $('.gauge').click(function() {

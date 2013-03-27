@@ -3,15 +3,14 @@
 
 <div class="row">
   <div class="span7">
-    <h2>Questions for you</h2>
-    <% for (var i in questions) { %>
-      <%- questions[i].render() %>
-    <% } %>
-  </div>
-  <div class="span5">
-    <h2>Questions you've answered</h2>
+    <%- current_question && current_question.render() %>
     <% for (var i in answers) { %>
       <%- answers[i].render() %>
     <% } %>
   </div>
+  <div class="span5">
+    charts and whatnot go here
+  </div>
 </div>
+
+<script>var next_questions = <%- JSON.stringify(next_questions) %>;</script>

@@ -9,18 +9,18 @@
 
 <div class="row">
 
-  <div class="span7">
+  <div class="span5">
 
     Add a question: <input class="question-search" type="text" data-results=".question-search-results">
     <div class="question-search-results"></div>
 
   </div>
 
-  <div class="span5">
+  <div class="span7">
 
     <div class="questions-list">
       <% for (var i in questions) { %>
-        <%- questions[i].render() %>
+        <%- questions[i].render('gauge') %>
       <% } %>
     </div>
 
@@ -46,3 +46,5 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dalog -->
 </div><!-- /.modal -->
+
+<input name="gauge-id" type="hidden" value="<%= gauge.id %>">

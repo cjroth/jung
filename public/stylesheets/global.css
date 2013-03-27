@@ -4,6 +4,10 @@ body {
   padding: 30px;
 }
 
+.modal-footer {
+  margin-top: 0;
+}
+
 .gauge {
   cursor: pointer;
   padding: 15px;
@@ -14,8 +18,14 @@ body {
   background: #eee;
 }
 
-.question {
-    margin-bottom: 30px;
+.question:not(:last-child) {
+    margin-bottom: 25px;
+}
+
+.question .dropdown-menu, .question .btn {
+  border-radius: 0 !important;
+  margin-left: 0;
+
 }
 
 .question .image {
@@ -38,17 +48,89 @@ body {
   -webkit-box-shadow: 5px 0 0 #00a3d0,-5px 0 0 #00a3d0;
 }
 
-.question .dropdown-menu, .question .btn {
-  border-radius: 0 !important;
-}
-
 .question button {
   background: #00a3d0;
   border-color: #00a3d0;
+  margin-left: 5px;
+  border-radius: 0;
 }
 
 .question .answers {
   opacity: .8;
   background: #000;
   padding: 10px;
+}
+
+.question .button-box {
+  width: 50%;
+  float: left;
+  text-align: right;
+  height: 50px;
+  line-height: 50px;
+}
+
+.question .spectrum-box {
+  width: 50%;
+  float: left;
+  padding-left: 10px;
+  height: 50px;
+}
+
+.question .spectrum-score {
+  height: 50px;
+  line-height: 50px;
+  width: 124px !important;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #fff;
+  padding: 0 12px;
+}
+
+.question .spectrum-label {
+  margin-left: 50%;
+}
+
+.question .spectrum-label div {
+  margin-left: 10px;
+  background: #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #fff;
+  float: left;
+  font-size: 9pt;
+  padding: 0 3px;
+}
+
+.question .right-label {
+  width: 134px;
+}
+
+.question .right-label div {
+  float: right;
+}
+
+.question .answered {
+  font-size: 24pt;
+  color: #fff;
+  font-weight: bold;
+  text-align: right;
+  padding: 10px;
+}
+
+.question.compact:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+.question.compact .answers {
+  display: none;
+}
+
+.question.compact h3 {
+  font-size: 11pt;
+  line-height: 11pt;
+  box-shadow: 0 0 0 3px #00a3d0;
+  opacity: .9;
+}
+
+.question.compact .image {
+  height: auto;
+  padding: 14px 10px;
 }

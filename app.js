@@ -20,7 +20,7 @@ var express = require('express')
   , pg = require('pg')
   , mysql = require('mysql')
   , async = require('async')
- // , _ = require('underscore')
+  , _ = require('underscore')
   ;
 
 var mysql_connection = mysql.createConnection({
@@ -130,11 +130,11 @@ passport.authorize = function(req, res, next) {
   res.redirect('/login')
 };
 
-var renderQuestion = ejs.compile(question_template);
 var renderGauge = ejs.compile(gauge_template);
 
 var QuestionModel = function(row) {
   this.answerable = false;
+  this.compact = false;
   for (var i in row) {
     this[i] = row[i];
   }
@@ -144,13 +144,25 @@ QuestionModel.prototype.getAnswers = function() {
   return this.answers.toString().split(',');
 };
 
-QuestionModel.prototype.render = function() {
-  return renderQuestion({
+QuestionModel.prototype.getScoring = function() {
+  if (!this.scoring) return false;
+  return this.scoring.toString().split(',');
+}
+
+QuestionModel.prototype.views = {
+  'default': ejs.compile(question_template),
+  'gauge': ejs.compile(question_gauge_template)
+};
+
+QuestionModel.prototype.render = function(view) {
+  return this.views[view || 'default']({
     id: this.id,
     question: this.question,
     answers: this.getAnswers(),
+    scoring: this.getScoring(),
     answer: this.answer,
-    answerable: this.answerable
+    answerable: this.answerable,
+    compact: this.compact
   });
 };
 
@@ -210,7 +222,7 @@ var getUserGauges = function(user_id, callback) {
 };
 
 var getGaugeQuestions = function(gauge_id, callback) {
-  mysql_connection.query('select * from questions join gauge_question_maps on questions.id = gauge_question_maps.question_id where gauge_id = ?', [gauge_id], function(err, rows) {
+  mysql_connection.query('select questions.*, gauge_question_maps.scoring from questions join gauge_question_maps on questions.id = gauge_question_maps.question_id where gauge_id = ?', [gauge_id], function(err, rows) {
     var questions = [];
     for (var i in rows) {
       var row = rows[i];
@@ -246,10 +258,17 @@ app.get('/home', function(req, res) {
       callback(err, questions);
     })
   }], function(err, results) {
+
+    var questions = results[0];
+    var answers = results[1]
+    var current_question = questions[0];
+    var next_questions = _.rest(questions, 1);
+
     res.render('home', {
       user: req.user,
-      questions: results[0],
-      answers: results[1],
+      current_question: current_question,
+      next_questions: next_questions,
+      answers: answers,
       question_template: question_template,
       question_gauge_template: question_gauge_template
     });
@@ -407,18 +426,29 @@ app.get('/answer/all', function(req, res) {
 });
 
 app.post('/gauge/add-question', function(req, res) {
-  GaugeQuestionMap.create({
-    gauge_id: req.body.gauge_id,
-    question_id: req.body.question_id,
-    scoring: req.body.scoring.toString()
-  })
-  .success(function() {
-    res.json({ result: true });
-  })
-  .error(function(error) {
-    console.error(error);
-    res.json({ result: false, errors: [error] });
+
+  var gauge_id = req.body['gauge-id'];
+  var question_id = req.body['question-id'];
+
+  mysql_connection.query('select count(*) as count from gauge_question_maps where gauge_id = ? and question_id = ?', [gauge_id, question_id], function(err, rows) {
+  
+    if (rows[0].count) return res.json({ result: false, errors: ['that question is already part of this gauge']});
+
+    GaugeQuestionMap.create({
+      gauge_id: gauge_id,
+      question_id: question_id,
+      scoring: req.body.scoring.toString()
+    })
+    .success(function() {
+      res.json({ result: true });
+    })
+    .error(function(error) {
+      console.error(error);
+      res.json({ result: false, errors: [error] });
+    });
+
   });
+
 });
 
 app.post('/answer/clear-all', passport.authorize, function(req, res) {
@@ -526,15 +556,15 @@ app.get('/user/:id', function(req, res) {
 
 app.get('/question', function(req, res) {
 
-    mysql_connection.query('select * from questions where id = 1', function(err, rows) {
-      var question = new QuestionModel(rows[0]);
-      res.render('question', {
-        user: req.user,
-        question_template: question_template,
-        question_gauge_template: question_gauge_template,
-        question: question
-      });
+  mysql_connection.query('select * from questions where id = 1', function(err, rows) {
+    var question = new QuestionModel(rows[0]);
+    res.render('question', {
+      user: req.user,
+      question_template: question_template,
+      question_gauge_template: question_gauge_template,
+      question: question
     });
+  });
 
 });
 
