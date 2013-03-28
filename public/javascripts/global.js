@@ -1,7 +1,4 @@
-var views = {
-  'question': ejs.compile($('#question-template').text()),
-  'question-gauge': ejs.compile($('#question-gauge-template').text())
-};
+var renderGaugeScore = ejs.compile($('#gauge-score-template').text());
 
 var Question = function(object) {
   var self = this;
@@ -38,6 +35,11 @@ var Question = function(object) {
     }
   }
   this._attachEventListeners();
+};
+
+Question.prototype.views = {
+  'question': ejs.compile($('#question-template').text()),
+  'question-gauge': ejs.compile($('#question-gauge-template').text()),
 };
 
 Question.detect = function() {
@@ -82,7 +84,7 @@ Question.prototype.getAnswers = function() {
 
 Question.prototype.render = function(view) {
   view = view || 'question';
-  var html = views[view]({
+  var html = this.views[view]({
     id: this.question_id,
     question: this.question,
     answers: this.getAnswers(),

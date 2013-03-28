@@ -57,8 +57,8 @@ app.configure('development', function() {
 
 var question_template = fs.readFileSync(__dirname + '/views/_question.ejs').toString();
 var gauge_template = fs.readFileSync(__dirname + '/views/_gauge.ejs').toString();
+var gauge_score_template = fs.readFileSync(__dirname + '/views/_gauge-score.ejs').toString();
 var question_gauge_template = fs.readFileSync(__dirname + '/views/_question-gauge.ejs').toString();
-
 
 /*
  * SEQUELIZE
@@ -130,7 +130,121 @@ passport.authorize = function(req, res, next) {
   res.redirect('/login')
 };
 
-var renderGauge = ejs.compile(gauge_template);
+
+var getNextQuestionSet = function(user_id, gauge_id, callback) {
+
+  if (!callback) {
+    callback = gauge_id;
+    gauge_id = null;
+  }
+
+  var gauge_clause = gauge_id ? ' and gauge_id = ?' : '';
+
+  mysql_connection.query('select * from questions where id not in (select answers.question_id from answers where answered_by = ? and deleted_at is null' + gauge_clause + ')', [user_id, gauge_id], function(err, rows) {
+    if (err) return callback(err);
+    var questions = [];
+    for (var i in rows) {
+      var row = rows[i];
+      row.answerable = true;
+      questions.push(new QuestionModel(row));
+    }
+    return callback(err, questions);
+  });
+
+};
+
+var getAnsweredQuestions = function(user_id, gauge_id, callback) {
+
+  if (!callback) {
+    callback = gauge_id;
+    gauge_id = null;
+  }
+
+  var gauge_clause = gauge_id ? ' and gauge_id = ?' : '';
+
+  mysql_connection.query('select * from answers join questions on answers.question_id = questions.id where answered_by = ?' + gauge_clause, [user_id, gauge_id], function(err, rows) {
+    if (err) return callback(err);
+    var questions = [];
+    for (var i in rows) {
+      var row = rows[i];
+      questions.push(new QuestionModel(row));
+    }
+    return callback(err, questions);
+  });
+};
+
+var getUserQuestions = function(user_id, callback) {
+  mysql_connection.query('select * from questions where created_by = ?', [user_id], function(err, rows) {
+    if (err) return callback(err);
+    var questions = [];
+    for (var i in rows) {
+      var row = rows[i];
+      questions.push(new QuestionModel(row));
+    }
+    return callback(err, questions);
+  });
+};
+
+var getUserGauges = function(user_id, callback) {
+  mysql_connection.query('select * from gauges where created_by = ?', [user_id], function(err, rows) {
+    if (err) return callback(err);
+    var gauges = [];
+    for (var i in rows) {
+      var row = rows[i];
+      gauges.push(new GaugeModel(row));
+    }
+    return callback(err, gauges);
+  });
+};
+
+var getGaugeQuestions = function(gauge_id, callback) {
+  mysql_connection.query('select questions.*, gauge_question_maps.scoring from questions join gauge_question_maps on questions.id = gauge_question_maps.question_id where gauge_id = ?', [gauge_id], function(err, rows) {
+    if (err) return callback(err);
+    var questions = [];
+    for (var i in rows) {
+      var row = rows[i];
+      questions.push(new QuestionModel(row));
+    }
+    return callback(null, questions);
+  });
+};
+
+var getGaugeScore = function(gauge_id, user_id, callback) {
+  mysql_connection.query('select * from answers join questions on answers.question_id = questions.id join gauge_question_maps on questions.id = gauge_question_maps.question_id where answered_by = ? and gauge_id = ?', [user_id, gauge_id], function(err, rows) {
+    // @todo handle err
+
+    if (err) return callback(err);
+
+    var scores = [];
+
+    for (var i in rows) {
+      var row = rows[i];
+      var answers = row.answers.split(',');
+      var answer_value = row.answer;
+      var answer_index = answers.indexOf(answer_value);
+      var scoring = row.scoring.split(',');
+      var answer_score = scoring[answer_index];
+      scores.push(answer_score);
+      //if (i == 2) {
+        console.log(scoring, answer_score, answer_index);
+      //}
+    }
+
+    var sum = 0;
+
+    for (var i in scores) {
+      var score = scores[i];
+      sum += parseInt(score);
+    }
+
+    var mean = sum / scores.length;
+
+    //res.json({ total: sum, score: mean, scores: scores, answers: rows });
+    return callback(null, { score: mean, answers: scores.length });
+
+  });
+};
+
 
 var QuestionModel = function(row) {
   this.answerable = false;
@@ -147,7 +261,7 @@ QuestionModel.prototype.getAnswers = function() {
 QuestionModel.prototype.getScoring = function() {
   if (!this.scoring) return false;
   return this.scoring.toString().split(',');
-}
+};
 
 QuestionModel.prototype.views = {
   'default': ejs.compile(question_template),
@@ -172,65 +286,28 @@ var GaugeModel = function(row) {
   }
 };
 
-GaugeModel.prototype.render = function() {
-  return renderGauge(this);
+GaugeModel.prototype.getLabel = function(side) {
+  switch (side) {
+    case 'left':
+      return this.name.split(',')[0];
+    case 'right':
+      return this.name.split(',')[1];
+    default:
+      return false;
+  }
 };
 
-var getNextQuestionSet = function(user_id, callback) {
-  mysql_connection.query('select * from questions where id not in (select answers.question_id from answers where answered_by = ? and deleted_at is null)', [user_id], function(err, rows) {
-    var questions = [];
-    for (var i in rows) {
-      var row = rows[i];
-      row.answerable = true;
-      questions.push(new QuestionModel(row));
-    }
-    callback(err, questions);
-  });
+GaugeModel.prototype.views = {
+  'default': ejs.compile(gauge_template),
+  'score': ejs.compile(gauge_score_template)
 };
 
-var getAnsweredQuestions = function(user_id, callback) {
-  mysql_connection.query('select * from answers join questions on answers.question_id = questions.id where answered_by = ?', [user_id], function(err, rows) {
-    var questions = [];
-    for (var i in rows) {
-      var row = rows[i];
-      questions.push(new QuestionModel(row));
-    }
-    callback(err, questions);
-  });
+GaugeModel.prototype.render = function(view, options) {
+  return this.views[view || 'default'](_.extend(this, {
+    loaded: false,
+  }, options));
 };
 
-var getUserQuestions = function(user_id, callback) {
-  mysql_connection.query('select * from questions where created_by = ?', [user_id], function(err, rows) {
-    var questions = [];
-    for (var i in rows) {
-      var row = rows[i];
-      questions.push(new QuestionModel(row));
-    }
-    callback(err, questions);
-  });
-};
-
-var getUserGauges = function(user_id, callback) {
-  mysql_connection.query('select * from gauges where created_by = ?', [user_id], function(err, rows) {
-    var gauges = [];
-    for (var i in rows) {
-      var row = rows[i];
-      gauges.push(new GaugeModel(row));
-    }
-    callback(err, gauges);
-  });
-};
-
-var getGaugeQuestions = function(gauge_id, callback) {
-  mysql_connection.query('select questions.*, gauge_question_maps.scoring from questions join gauge_question_maps on questions.id = gauge_question_maps.question_id where gauge_id = ?', [gauge_id], function(err, rows) {
-    var questions = [];
-    for (var i in rows) {
-      var row = rows[i];
-      questions.push(new QuestionModel(row));
-    }
-    callback(err, questions);
-  });
-};
 
 /*
  * ROUTES
@@ -270,7 +347,8 @@ app.get('/home', function(req, res) {
       next_questions: next_questions,
       answers: answers,
       question_template: question_template,
-      question_gauge_template: question_gauge_template
+      question_gauge_template: question_gauge_template,
+      gauge_score_template: gauge_score_template
     });
   });
 });
@@ -321,7 +399,8 @@ app.get('/gauge/new', passport.authorize, function(req, res) {
       user: req.user,
       question_template: question_template,
       gauges: gauges,
-      question_gauge_template: question_gauge_template
+      question_gauge_template: question_gauge_template,
+      gauge_score_template: gauge_score_template
     });
   });
 });
@@ -344,22 +423,54 @@ app.post('/gauge/new', passport.authorize, function(req, res) {
 
 app.get('/gauge/:id', function(req, res) {
 
-  getGaugeQuestions(req.params.id, function(err, questions) {
+  var gauge_id = req.params.id;
+  var editable = false;
 
-    Gauge.find(req.params.id)
-      .success(function(gauge) {
+  Gauge.find(gauge_id)
+    .success(function(gauge) {
+
+      if (gauge.created_by == req.user.id || user.role == 'admin') {
+        editable = true;
+      }
+
+      async.parallel([function(callback) {
+        if (editable) {
+          getGaugeQuestions(gauge_id, function(err, questions) {
+            callback(err, questions);
+          });
+          return;
+        }
+        getNextQuestionSet(req.user.id, gauge_id, function(err, questions) {
+          callback(err, questions);
+        });
+      }, function(callback) {
+        getAnsweredQuestions(req.user.id, gauge_id, function(err, questions) {
+          callback(err, questions);
+        });
+      }], function(err, results) {
+
+        var questions = results[0];
+        var answers = results[1]
+        var current_question = questions[0];
+        var next_questions = _.rest(questions, 1);
+
         res.render('gauge/single', {
           user: req.user,
           gauge: new GaugeModel(gauge),
           questions: questions,
+          current_question: current_question,
           question_template: question_template,
-          question_gauge_template: question_gauge_template
+          question_gauge_template: question_gauge_template,
+          gauge_score_template: gauge_score_template
+
         });
-      })
-      .error(function(error) {
-        // @todo handle error
+
       });
-  });
+
+    })
+    .error(function(err) {
+      // @todo handle error...
+    });
 
 });
 
@@ -573,35 +684,9 @@ app.get('/score/:gauge_id', function(req, res) {
   var user_id = req.user.id;
   var gauge_id = req.params.gauge_id;
 
-  mysql_connection.query('select * from answers join questions on answers.question_id = questions.id join gauge_question_maps on questions.id = gauge_question_maps.question_id where answered_by = ? and gauge_id = ?', [user_id, gauge_id], function(err, rows) {
-    // @todo handle err
-
-    var scores = [];
-
-    for (var i in rows) {
-      var row = rows[i];
-      var answers = row.answers.split(',');
-      var answer_value = row.answer;
-      var answer_index = answers.indexOf(answer_value);
-      var scoring = row.scoring.split(',');
-      var answer_score = scoring[answer_index];
-      scores.push(answer_score);
-      //if (i == 2) {
-        console.log(scoring, answer_score, answer_index);
-      //}
-    }
-
-    var sum = 0;
-
-    for (var i in scores) {
-      var score = scores[i];
-      sum += parseInt(score);
-    }
-
-    var mean = sum / scores.length;
-
-    //res.json({ total: sum, score: mean, scores: scores, answers: rows });
-    res.json({ score: mean, answers: scores.length });
+  getGaugeScore(gauge_id, user_id, function(err, score) {
+    // @todo handle error
+    res.json({ result: true, score: score });
   });
 
 });

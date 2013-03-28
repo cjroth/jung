@@ -3,18 +3,18 @@
 <% script('/javascripts/gauge/new.js') %>
 
 <div class="row">
-  <div class="span6">
-
-    <form class="form form-gauge" action="/gauge/new" method="POST" data-success="/gauge/:id">
-      <input name="name" type="text" placeholder="Name your gauge">
-      <button type="submit" class="btn btn-primary">Create Gauge</button>
-    </form>
-
-  </div>
-  <div class="span6">
-    <% for (var i in gauges) { %>
-      <%- gauges[i].render() %>
-      <button class="gauge-get-score btn" data-gauge-id="<%= gauges[i].id %>">Get Score</button>
-    <% } %>
+  <div class="col-span-12">
+    <table class="table">
+      <% for (var i in gauges) { %>
+        <tr>
+          <td>
+            <%- gauges[i].render() %>
+          </td>
+          <td class="gauge-score">
+            <button class="btn get-gauge-score">Get Score</button>
+          </td>
+        </tr>
+      <% } %>
+    </table>
   </div>
 </div>

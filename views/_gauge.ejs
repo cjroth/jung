@@ -1,6 +1,6 @@
-<div class="gauge" data-name="<%= name %>" data-gauge-id="<%= id %>">
-  <h2><%= name %></h2>
-  <p class="description">
-    <%= description %>
-  </p>
+<div class="gauge spectrum-header" data-gauge-id="<%= id %>">
+  <div class="spectrum clearfix"><h2><%= getLabel('left') %></h2></div>
+  <% if (getLabel('right')) { %>
+    <div class="spectrum clearfix"><h2><%= getLabel('right') %></h2></div>
+  <% } %>
 </div>

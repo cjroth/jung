@@ -13,8 +13,7 @@
         <a class="navbar-brand" href="/">Jung</a>
         <ul class="nav">
           <li><a href="/home">Home</a></li>
-          <li><a href="/gauge/new">Gauges</a></li>
-          <li><a href="/charts">Charts</a></li>
+          <li><a href="/gauge/new">Spectrums</a></li>
           <li><a id="clear-answers" href="/answer/clear-all">Clear Answers</a></li>
         </ul>
         <ul class="nav pull-right">
@@ -40,6 +39,9 @@
     </script>
     <script id="question-gauge-template" type="text/template">
       <%- question_gauge_template %>
+    </script>
+    <script id="gauge-score-template" type="text/template">
+      <%- gauge_score_template %>
     </script>
     <script src="/javascripts/global.js"></script>
     <%- scripts %>

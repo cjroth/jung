@@ -2,13 +2,13 @@
 <% stylesheet('/stylesheets/home.css') %>
 
 <div class="row">
-  <div class="span7">
+  <div class="col-span-7">
     <%- current_question && current_question.render() %>
     <% for (var i in answers) { %>
       <%- answers[i].render() %>
     <% } %>
   </div>
-  <div class="span5">
+  <div class="col-span-5">
     charts and whatnot go here
   </div>
 </div>

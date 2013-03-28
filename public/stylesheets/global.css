@@ -8,16 +8,6 @@ body {
   margin-top: 0;
 }
 
-.gauge {
-  cursor: pointer;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.gauge:hover {
-  background: #eee;
-}
-
 .question:not(:last-child) {
     margin-bottom: 25px;
 }
@@ -133,4 +123,53 @@ body {
 .question.compact .image {
   height: auto;
   padding: 14px 10px;
+}
+
+
+.spectrum-header {
+  padding: 30px 80px;
+  background: #eee;
+  margin-bottom: 30px;
+  background: #333330;
+}
+
+.spectrum:first-child {
+  border-left: 2px solid #eee;
+  border-bottom: 2px solid #eee;
+}
+
+.spectrum:last-child {
+  border-right: 2px solid #eee;
+}
+
+.spectrum h2 {
+  margin: 0;
+  padding: 0 10px;
+  background: #00a3d0;
+  display: block;
+  color: #eee;
+}
+
+.spectrum:first-child h2 {
+  float: left;
+}
+
+.spectrum:last-child h2 {
+  float: right;
+}
+
+.spectrum:only-child {
+  border-width: 0 2px 2px 0;
+}
+
+.question-search-results .question {
+  cursor: pointer;
+}
+
+.gauge {
+  cursor: pointer;
+}
+
+.gauge:hover {
+  background: #444440;
 }

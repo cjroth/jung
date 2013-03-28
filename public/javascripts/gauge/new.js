@@ -14,12 +14,16 @@
     return false;
   });
   
-  $('.gauge-get-score').click(function() {
+  $('.get-gauge-score').click(function() {
 
-    var gauge_id = $(this).data('gauge-id');
+    var $tr = $(this).parents('tr');
+    var $gauge = $tr.find('.gauge');
+
+    var gauge_id = $gauge.data('gauge-id');
 
     $.get('/score/' + gauge_id, function(data) {
-      $('.gauge[data-gauge-id=' + gauge_id + '] .description').text(data.score);
+      var html = renderGaugeScore(data.score);
+      $tr.find('td.gauge-score').html(html);
     });
 
     return false;
