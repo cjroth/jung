@@ -55,18 +55,22 @@ app.configure('development', function() {
   app.use(express.errorHandler());
 });
 
-var question_template = fs.readFileSync(__dirname + '/views/_question.ejs').toString();
-var gauge_template = fs.readFileSync(__dirname + '/views/_gauge.ejs').toString();
-var gauge_score_template = fs.readFileSync(__dirname + '/views/_gauge-score.ejs').toString();
-var question_gauge_template = fs.readFileSync(__dirname + '/views/_question-gauge.ejs').toString();
+var templates = {
+  'question': fs.readFileSync(__dirname + '/views/_question.ejs').toString(),
+  'gauge': fs.readFileSync(__dirname + '/views/_gauge.ejs').toString(),
+  'gauge-score': fs.readFileSync(__dirname + '/views/_gauge-score.ejs').toString(),
+  'question-gauge': fs.readFileSync(__dirname + '/views/_question-gauge.ejs').toString()
+};
+
+var view_globals = {
+  templates: templates
+};
 
 /*
  * SEQUELIZE
  */
 
 var sequelize = new Sequelize(config.sql.database, config.sql.username, config.sql.password, config.sql.config);
-
-sequelize._renderQuestion = ejs.compile(question_template);
 
 var User = sequelize.import(__dirname + '/models/user');
 var Question = sequelize.import(__dirname + '/models/question');
@@ -245,7 +249,6 @@ var getGaugeScore = function(gauge_id, user_id, callback) {
   });
 };
 
-
 var QuestionModel = function(row) {
   this.answerable = false;
   this.compact = false;
@@ -264,8 +267,8 @@ QuestionModel.prototype.getScoring = function() {
 };
 
 QuestionModel.prototype.views = {
-  'default': ejs.compile(question_template),
-  'gauge': ejs.compile(question_gauge_template)
+  'default': ejs.compile(templates['question']),
+  'gauge': ejs.compile(templates['question-gauge'])
 };
 
 QuestionModel.prototype.render = function(view) {
@@ -298,8 +301,8 @@ GaugeModel.prototype.getLabel = function(side) {
 };
 
 GaugeModel.prototype.views = {
-  'default': ejs.compile(gauge_template),
-  'score': ejs.compile(gauge_score_template)
+  'default': ejs.compile(templates['gauge']),
+  'score': ejs.compile(templates['gauge-score'])
 };
 
 GaugeModel.prototype.render = function(view, options) {
@@ -341,15 +344,12 @@ app.get('/home', function(req, res) {
     var current_question = questions[0];
     var next_questions = _.rest(questions, 1);
 
-    res.render('home', {
+    res.render('home', _.extend(view_globals, {
       user: req.user,
       current_question: current_question,
       next_questions: next_questions,
-      answers: answers,
-      question_template: question_template,
-      question_gauge_template: question_gauge_template,
-      gauge_score_template: gauge_score_template
-    });
+      answers: answers
+    }));
   });
 });
 
@@ -395,13 +395,10 @@ app.post('/signup', function(req, res) {
 app.get('/gauge/new', passport.authorize, function(req, res) {
   getUserGauges(req.user.id, function(err, gauges) {
     // @todo handle err
-    res.render('gauge/new', {
+    res.render('gauge/new', _.extend(view_globals, {
       user: req.user,
-      question_template: question_template,
-      gauges: gauges,
-      question_gauge_template: question_gauge_template,
-      gauge_score_template: gauge_score_template
-    });
+      gauges: gauges
+    }));
   });
 });
 
@@ -454,16 +451,12 @@ app.get('/gauge/:id', function(req, res) {
         var current_question = questions[0];
         var next_questions = _.rest(questions, 1);
 
-        res.render('gauge/single', {
+        res.render('gauge/single', _.extend(view_globals, {
           user: req.user,
           gauge: new GaugeModel(gauge),
           questions: questions,
-          current_question: current_question,
-          question_template: question_template,
-          question_gauge_template: question_gauge_template,
-          gauge_score_template: gauge_score_template
-
-        });
+          current_question: current_question
+        }));
 
       });
 
@@ -490,12 +483,11 @@ app.get('/question/search', passport.authorize, function(req, res) {
 app.get('/question/new', passport.authorize, function(req, res) {
   getUserQuestions(req.user.id, function(err, questions) {
     // @todo handle error
-    return res.render('question/new', {
+    return res.render('question/new', _.extend(view_globals, {
       user: req.user,
       questions: questions,
-      question_template: question_template,
-      question_gauge_template: question_gauge_template
-    });
+      view_globals: view_globals
+    }));
   });
 });
 
@@ -597,11 +589,9 @@ app.post('/answer/:question_id', passport.authorize, function(req, res) {
 
 app.get('/charts', function(req, res) {
 
-  res.render('charts', {
+  res.render('charts', _.extend(view_globals, {
     user: req.user,
-          question_template: question_template,
-      question_gauge_template: question_gauge_template
-  });
+  }));
 
 });
 
@@ -609,10 +599,9 @@ app.get('/chart/:id', function(req, res) {
 
   var chart_id = req.params.id;
 
-  res.render('charts/' + chart_id, {
-    user: req.user,
-          question_template: question_template,
-      question_gauge_template: question_gauge_template  });
+  res.render('charts/' + chart_id, _.extend(view_globals, {
+    user: req.user
+  }));
 
 });
 
@@ -651,15 +640,14 @@ app.get('/user/:id', function(req, res) {
     var questions_answered = results[2];
     var questions_written = results[3];
 
-    res.render('user/single', {
+    res.render('user/single', _.extend(view_globals, {
       user: req.user,
       target_user: user,
       gauges_created: gauges_created,
       questions_answered: questions_answered,
       questions_written: questions_written,
-      question_template: question_template,
-      question_gauge_template: question_gauge_template
-    });
+      view_globals: view_globals
+    }));
 
   });
 
@@ -669,12 +657,10 @@ app.get('/question', function(req, res) {
 
   mysql_connection.query('select * from questions where id = 1', function(err, rows) {
     var question = new QuestionModel(rows[0]);
-    res.render('question', {
+    res.render('question', _.extend(view_globals, {
       user: req.user,
-      question_template: question_template,
-      question_gauge_template: question_gauge_template,
       question: question
-    });
+    }));
   });
 
 });
@@ -689,6 +675,18 @@ app.get('/score/:gauge_id', function(req, res) {
     res.json({ result: true, score: score });
   });
 
+});
+
+app.get('/test', function(req, res) {
+
+    getUserGauges(req.user.id, function(err, gauges) {
+      // @todo handle err
+      res.render('test', _.extend(view_globals, {
+        user: req.user,
+        gauges: gauges
+      }));
+    });
+  
 });
 
 http.createServer(app).listen(app.get('port'), function(){

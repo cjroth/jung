@@ -126,23 +126,28 @@ body {
 }
 
 
-.spectrum-header {
-  padding: 30px 80px;
+.spectrum {
+  padding: 29px 80px;
   background: #eee;
   margin-bottom: 30px;
   background: #333330;
+  cursor: pointer;
 }
 
-.spectrum:first-child {
+.spectrum:hover {
+  background: #444440;
+}
+
+.spectrum-label:first-child {
   border-left: 2px solid #eee;
   border-bottom: 2px solid #eee;
 }
 
-.spectrum:last-child {
+.spectrum-label:last-child {
   border-right: 2px solid #eee;
 }
 
-.spectrum h2 {
+.spectrum-label h2 {
   margin: 0;
   padding: 0 10px;
   background: #00a3d0;
@@ -150,15 +155,15 @@ body {
   color: #eee;
 }
 
-.spectrum:first-child h2 {
+.spectrum-label:first-child h2 {
   float: left;
 }
 
-.spectrum:last-child h2 {
+.spectrum-label:last-child h2 {
   float: right;
 }
 
-.spectrum:only-child {
+.spectrum-label:only-child {
   border-width: 0 2px 2px 0;
 }
 
@@ -166,10 +171,14 @@ body {
   cursor: pointer;
 }
 
-.gauge {
-  cursor: pointer;
+.score {
+  background: #444440;
+  height: 100px;
 }
 
-.gauge:hover {
-  background: #444440;
+.score h3 {
+  margin: 0;
+  color: #fff;
+  padding: 15px;
+  line-height: 20px;
 }

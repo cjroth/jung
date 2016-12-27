@@ -34,14 +34,17 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <script src="/javascripts/ejs.min.js"></script>
     <script src="/raty/jquery.raty.min.js"></script>
+    <script src="/javascripts/model.js"></script>
+    <script src="/javascripts/models/question.js"></script>
+    <script src="/javascripts/models/spectrum.js"></script>
     <script id="question-template" type="text/template">
-      <%- question_template %>
+      <%- templates['question'] %>
     </script>
     <script id="question-gauge-template" type="text/template">
-      <%- question_gauge_template %>
+      <%- templates['question-gauge'] %>
     </script>
     <script id="gauge-score-template" type="text/template">
-      <%- gauge_score_template %>
+      <%- templates['gauge-score'] %>
     </script>
     <script src="/javascripts/global.js"></script>
     <%- scripts %>

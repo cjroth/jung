@@ -1,0 +1,43 @@
+<% layout('/global') %>
+<!doctype html>
+<html ng-app>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"></script>
+    <script>
+
+      var gauges = <%- JSON.stringify(gauges) %>
+
+      function Controller($scope) {
+        $scope.spectrums = gauges;
+        $scope.clicked = function(spectrum) {
+          window.location = '/gauge/' + spectrum.id;
+        }
+        $scope.submit = function() {
+          console.log('submitted', arguments, $scope.wat);
+        }
+        $scope.change = function() {
+          console.log('woot', $scope.test);
+        }
+      }
+
+    </script>
+  </head>
+  <body ng-controller="Controller">
+    <table class="table">
+      <tr ng-repeat="spectrum in spectrums">
+        <td>
+          <div class="spectrum" ng-click="clicked(spectrum)" data-gauge-id="{{spectrum.id}}">
+            <div class="spectrum-label clearfix"><h2>{{spectrum.name}}</h2></div>
+            <div class="spectrum-label clearfix"><h2>{{spectrum.name}}</h2></div>
+          </div>
+        </td>
+        <td>
+          <div class="score">
+            <h3>blah</h3>
+            <h3>blah</h3>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
